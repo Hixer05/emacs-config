@@ -1,0 +1,217 @@
+#+title: Basic emacs config
+
+Utility to edit this:
+#+begin_src emacs-lisp
+(progn
+  (add-to-list 'org-structure-template-alist
+               '("elc" . "src emacs-lisp :noweb-ref configurations"))
+  (add-to-list 'org-structure-template-alist
+               '("eld" . "src emacs-lisp :noweb-ref definitions"))
+  (add-to-list 'org-structure-template-alist '("scp" . "src scheme :noweb-ref packages")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+;;; config.el -*- lexical-binding: t; -*-
+#+end_src
+
+* User
+#+begin_src emacs-lisp :noweb-ref configurations
+(setq user-full-name "William Brusa"
+      user-mail-address "william.brusa@studio.unibo.it")
+#+end_src
+
+* Package Management
+#+begin_src emacs-lisp :noweb-ref definitions
+(defcustom my/is-guix nil
+  "Use guix package management rather than use-package."
+  :type 'booleanp)
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref configurations
+(require 'use-package)
+(setq use-package-always-ensure (not my/is-guix))
+#+end_src
+
+* UI
+#+begin_src emacs-lisp :noweb-ref configurations
+(setq inhibit-startup-message nil)
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+(menu-bar-mode -1)            ; Disable the menu bar
+#+end_src
+
+Setup doom thems and fonts.
+#+begin_src emacs-lisp :noweb-ref definitions
+(defcustom my/doom-theme 'doom-gruvbox
+  "doom-themes theme to load."
+  :type 'symbol)
+(defcustom my/doom-theme-variant "medium"
+  "doom-theme variant." :type 'string)
+(defcustom my/sans-serif-font "Isoevka Aile 16"
+  "The sans-serif font to be used." :type 'string)
+(defcustom my/mono-font "Fira Code 16"
+  "The mono-font to be used." :type 'string)
+#+end_src
+
+#+begin_src emacs-lisp :noweb-ref configurations
+(set-face-attribute 'default nil :font my/mono-font)
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+(use-package doom-themes
+  :init (load-theme 'doom-gruvbox t))
+
+#+end_src
+
+*Guix Packages*:
+#+begin_src scheme :noweb-ref packages
+    "font-fira-code"
+    "font-iosevka"
+    "font-nerd-symbols"
+    "emacs-doom-themes"
+    "emacs-doom-modeline"
+    "emacs-all-the-icons"
+#+end_src
+
+* Keybinds
+Setup evil configuration.
+#+begin_src emacs-lisp :noweb-ref configurations
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-minibuffer t)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :config
+  (evil-mode 1)
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  )
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+#+end_src
+
+Setup which-key.
+#+begin_src emacs-lisp :noweb-ref         configurations
+(use-package which-key
+  :defer 0
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 0.3))
+#+end_src
+
+Setup general with evil setup.
+#+begin_src emacs-lisp :noweb-ref configurations
+(use-package general
+  :after evil
+  :config
+  (general-evil-setup t))
+
+(general-create-definer my/leader-keys
+  :keymaps '(normal insert visual emacs)
+  :prefix "SPC"
+  :global-prefix "C-SPC")
+
+(my/leader-keys
+ "u" '(universal-argument :which-key "C-u"))
+#+end_src
+
+*Guix Packages*:
+#+begin_src scheme :noweb-ref packages
+    "emacs-evil"
+    "emacs-evil-collection"
+    "emacs-general"
+#+end_src
+
+* Completion & QOL
+#+begin_src emacs-lisp :noweb-ref configurations
+(use-package vertico
+  :general
+  (:states '(normal insert motion emacs) :keymaps 'vertico-map
+	   "<escape>" #'minibuffer-keyboard-quit
+	   "C-J"      #'vertico-next-group
+	   "C-K"      #'vertico-previous-group
+	   "C-j"      #'vertico-next
+	   "C-k"      #'vertico-previous
+	   "M-RET"    #'vertico-exit)
+  :init
+  (vertico-mode))
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t) ;; Emacs 31: partial-completion behaves like substring
+  )
+
+(use-package marginalia
+  :after vertico
+  :init
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-auto t)
+
+  ;; FIXME: This used to be under use-package emacs
+  (tab-always-indent 'complete)
+
+  ;; Emacs 30 and newer: Disable Ispell completion function.
+  ;; Try `cape-dict' as an alternative.
+  (text-mode-ispell-word-completion nil)
+
+  ;; Hide commands in M-x which do not apply to the current mode.  Corfu
+  ;; commands are hidden, since they are not used via M-x. This setting is
+  ;; useful beyond Corfu.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+
+  :hook ((prog-mode . corfu-mode))
+  :init
+  (global-corfu-mode)
+  (corfu-popupinfo-mode))
+#+end_src
+
+*GUIX Packages*:
+#+begin_src scheme :noweb-ref packages
+    "emacs-vertico"
+    "emacs-corfu"
+    "emacs-marginalia"
+    "emacs-orderless"
+#+end_src
+
+* GUIX packages manifest
+#+begin_src scheme :tangle ./emacs-basic.scm :noweb yes
+(define-module (emacs-basic)
+  #:use-module (gnu packages)
+  #:export (emacs-basic-manifest))
+
+(define emacs-basic-manifest
+  (specifications->manifest
+   '("emacs"
+     <<packages>>
+     )))
+#+end_src
+
+* Module setup
+#+begin_src emacs-lisp :tangle yes :noweb yes
+<<definitions>>
+
+(defun emacs-basic/configure ()
+  <<configurations>>
+)
+#+end_src

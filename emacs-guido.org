@@ -1,0 +1,34 @@
+#+title:  Guido's Emacs Configuration
+
+#+begin_src emacs-lisp :tangle yes
+;;; config.el -*- lexical-binding: t; -*-
+#+end_src
+
+Load all the interested modules. This will tangle all the files and load all the definitions.
+#+begin_src emacs-lisp :tangle ./init.el
+;; TODO: add to a shared .el
+(let ((modules '("emacs-basic")))
+  (dolist (module modules)
+    (unless (file-exists-p (concat module ".el"))
+      (org-babel-tangle-file (concat module ".org")))
+    (load (concat module ".el"))))
+#+end_src
+
+* GUIX package manifest
+#+begin_src emacs-lisp :noweb-ref overrides
+(setq my/is-guix t)
+#+end_src
+
+Generate guido's guix emacs packages manifest, from submodules defintion.
+#+begin_src scheme :tangle ./emacs.scm
+(add-to-load-path ".")
+(use-modules (emacs-basic))
+(concatenate-manifests (list emacs-basic-manifest))
+#+end_src
+
+* Tangle
+Finally we can configure the system, and apply overriding configs.
+#+begin_src emacs-lisp :tangle ./init.el :noweb yes
+(emacs-basic/configure)
+<<overrides>>
+#+end_src
