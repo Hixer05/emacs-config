@@ -1,6 +1,6 @@
 #+title:  Guido's Emacs Configuration
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle ./init.el
 ;;; config.el -*- lexical-binding: t; -*-
 #+end_src
 
