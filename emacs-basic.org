@@ -1,15 +1,4 @@
 #+title: Basic emacs config
-
-Utility to edit this:
-#+begin_src emacs-lisp
-(progn
-  (add-to-list 'org-structure-template-alist
-               '("elc" . "src emacs-lisp :noweb-ref configurations"))
-  (add-to-list 'org-structure-template-alist
-               '("eld" . "src emacs-lisp :noweb-ref definitions"))
-  (add-to-list 'org-structure-template-alist '("scp" . "src scheme :noweb-ref packages")))
-#+end_src
-
 #+begin_src emacs-lisp :tangle yes
 ;;; config.el -*- lexical-binding: t; -*-
 #+end_src
