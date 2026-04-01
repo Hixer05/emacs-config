@@ -15,7 +15,7 @@ Load all the interested modules. This will tangle all the files and load all the
 #+end_src
 
 * GUIX package manifest
-#+begin_src emacs-lisp :noweb-ref overrides
+#+begin_src emacs-lisp :noweb-ref settings
 (setq my/is-guix t)
 #+end_src
 
@@ -29,6 +29,7 @@ Generate guido's guix emacs packages manifest, from submodules defintion.
 * Tangle
 Finally we can configure the system, and apply overriding configs.
 #+begin_src emacs-lisp :tangle ./init.el :noweb yes
+<<settings>>
 (emacs-basic/configure)
 <<overrides>>
 #+end_src
