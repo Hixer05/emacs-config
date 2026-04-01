@@ -6,12 +6,9 @@
 
 Load all the interested modules. This will tangle all the files and load all the definitions.
 #+begin_src emacs-lisp :tangle ./init.el
-;; TODO: add to a shared .el
-(let ((modules '("emacs-basic")))
-  (dolist (module modules)
-    (unless (file-exists-p (concat module ".el"))
-      (org-babel-tangle-file (concat module ".org")))
-    (load (concat module ".el"))))
+(unless (file-exists-p "emacs-basic.el")
+  (org-babel-tangle-file "emacs-basic.org"))
+(load-file "emacs-basic.el")
 #+end_src
 
 * GUIX package manifest
