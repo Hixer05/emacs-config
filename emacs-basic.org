@@ -38,9 +38,9 @@ Setup doom thems and fonts.
   :type 'symbol)
 (defcustom my/doom-theme-variant "medium"
   "doom-theme variant." :type 'string)
-(defcustom my/sans-serif-font "Isoevka Aile 16"
+(defcustom my/sans-serif-font "Iosevka Aile"
   "The sans-serif font to be used." :type 'string)
-(defcustom my/mono-font "Fira Code 16"
+(defcustom my/mono-font "Fira Code"
   "The mono-font to be used." :type 'string)
 #+end_src
 
