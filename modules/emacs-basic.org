@@ -1,6 +1,24 @@
 #+title: Basic emacs config
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle ./emacs-basic-def.el :noweb yes
 ;;; config.el -*- lexical-binding: t; -*-
+<<definitions>>
+#+end_src
+
+#+begin_src emacs-lisp :tangle ./emacs-basic-conf.el :noweb yes
+;;; config.el -*- lexical-binding: t; -*-
+<<configurations>>
+#+end_src
+* GUIX packages manifest
+#+begin_src scheme :tangle ./emacs-basic.scm :noweb yes
+(define-module (emacs-basic)
+  #:use-module (gnu packages)
+  #:export (emacs-basic-manifest))
+
+(define emacs-basic-manifest
+  (specifications->manifest
+   '("emacs"
+     <<packages>>
+     )))
 #+end_src
 
 * User
@@ -192,24 +210,3 @@ Setup general with evil setup.
     "emacs-orderless"
 #+end_src
 
-* GUIX packages manifest
-#+begin_src scheme :tangle ./emacs-basic.scm :noweb yes
-(define-module (emacs-basic)
-  #:use-module (gnu packages)
-  #:export (emacs-basic-manifest))
-
-(define emacs-basic-manifest
-  (specifications->manifest
-   '("emacs"
-     <<packages>>
-     )))
-#+end_src
-
-* Module setup
-#+begin_src emacs-lisp :tangle yes :noweb yes
-<<definitions>>
-
-(defun emacs-basic/configure ()
-  <<configurations>>
-)
-#+end_src

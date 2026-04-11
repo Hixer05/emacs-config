@@ -1,32 +1,44 @@
-#+title:  Guido's Emacs Configuration
+#+title: Guido's Emacs Configuration
 
-#+begin_src emacs-lisp :tangle ./init.el
-;;; config.el -*- lexical-binding: t; -*-
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+;; (defvar my/prefix "~/.config/emacs/")
+(defvar my/prefix "~/Programmazione/emacs-config/")
+(defvar my/modules-path (concat my/prefix "modules/"))
+
+(let* ((basic-derivation-def (concat my/modules-path "emacs-basic-def.el")))
+  (if (file-exists-p basic-derivation-def) (load basic-derivation-def)
+    (message "Missing inheriting system module.")))
+
+(defvar my/modules (list
+                    <<modules>>
+                    ))
+
+(dolist (module my/modules)
+        (let ((module-full (concat my/modules-path module "-def.el")))
+              (when (file-exists-p module-full) (load module-full))))
+
+;; configure defcustom
+<<configurations>>
+
+(let* ((basic-derivation-conf (concat my/modules-path "emacs-basic-conf.el")))
+  (if (file-exists-p basic-derivation-conf) (load basic-derivation-conf)
+    (message "Missing inheriting system module.")))
+
+(dolist (module my/modules)
+        (let ((module-full (concat my/modules-path module "-conf.el")))
+              (when (file-exists-p module-full) (load module-full))))
+
+<<overrides>>
 #+end_src
 
-Load all the interested modules. This will tangle all the files and load all the definitions.
-#+begin_src emacs-lisp :tangle ./init.el
-(unless (file-exists-p "emacs-basic.el")
-  (org-babel-tangle-file "emacs-basic.org"))
-(load-file "emacs-basic.el")
-#+end_src
-
-* GUIX package manifest
-#+begin_src emacs-lisp :noweb-ref settings
+* Guix packages
+#+begin_src emacs-lisp :noweb-ref configurations
 (setq my/is-guix t)
 #+end_src
-
-Generate guido's guix emacs packages manifest, from submodules defintion.
+** Manifest setup
 #+begin_src scheme :tangle ./emacs.scm
 (add-to-load-path ".")
 (use-modules (emacs-basic))
 (concatenate-manifests (list emacs-basic-manifest))
 #+end_src
-
-* Tangle
-Finally we can configure the system, and apply overriding configs.
-#+begin_src emacs-lisp :tangle ./init.el :noweb yes
-<<settings>>
-(emacs-basic/configure)
-<<overrides>>
-#+end_src
+*** TODO automatic module loading for guix manifests
