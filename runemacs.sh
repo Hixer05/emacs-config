@@ -5,4 +5,4 @@ guix shell -m emacs.scm -C --pure \
     -E '^XAUTHORITY$' \
     --share=/tmp/.X11-unix \
     --expose=$XAUTHORITY \
-    -- emacs --init-directory=.
+    -- emacs --init-directory=./emacs.d/ --debug-init
