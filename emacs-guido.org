@@ -37,8 +37,8 @@
 #+end_src
 ** Manifest setup
 #+begin_src scheme :tangle ./emacs.scm
-(add-to-load-path ".")
-(use-modules (emacs-basic))
+(add-to-load-path (getcwd))
+(use-modules (modules emacs-basic))
 (concatenate-manifests (list emacs-basic-manifest))
 #+end_src
 *** TODO automatic module loading for guix manifests
